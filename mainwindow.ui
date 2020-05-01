@@ -1,0 +1,341 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>800</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>QTextRecognizer</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="res.qrc">
+    <normaloff>:/breeze-icons-master/icons-dark/preferences/32/preferences-releasenotes.svg</normaloff>:/breeze-icons-master/icons-dark/preferences/32/preferences-releasenotes.svg</iconset>
+  </property>
+  <widget class="QWidget" name="centralWidget">
+   <layout class="QGridLayout" name="gridLayout_2">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string>Ready</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="0">
+     <widget class="MyGraphicsView" name="graphicsView">
+      <property name="renderHints">
+       <set>QPainter::Antialiasing|QPainter::HighQualityAntialiasing|QPainter::SmoothPixmapTransform</set>
+      </property>
+      <property name="dragMode">
+       <enum>QGraphicsView::RubberBandDrag</enum>
+      </property>
+     </widget>
+    </item>
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
+      <property name="sizePolicy">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+        <horstretch>0</horstretch>
+        <verstretch>0</verstretch>
+       </sizepolicy>
+      </property>
+      <property name="text">
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+      </property>
+     </widget>
+    </item>
+   </layout>
+  </widget>
+  <widget class="QMenuBar" name="menuBar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>800</width>
+     <height>21</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QToolBar" name="mainToolBar">
+   <property name="allowedAreas">
+    <set>Qt::LeftToolBarArea|Qt::TopToolBarArea</set>
+   </property>
+   <attribute name="toolBarArea">
+    <enum>TopToolBarArea</enum>
+   </attribute>
+   <attribute name="toolBarBreak">
+    <bool>false</bool>
+   </attribute>
+   <addaction name="actionOpenImage"/>
+   <addaction name="separator"/>
+   <addaction name="actionRotate"/>
+   <addaction name="separator"/>
+   <addaction name="actionPreprocess"/>
+   <addaction name="separator"/>
+   <addaction name="actionZoom_Out"/>
+   <addaction name="actionZoom_In"/>
+   <addaction name="actionBest_Fit"/>
+   <addaction name="separator"/>
+   <addaction name="actionAdjust_image"/>
+   <addaction name="separator"/>
+   <addaction name="actionClear_recognize_areas"/>
+   <addaction name="actionRecognize_text"/>
+   <addaction name="separator"/>
+  </widget>
+  <widget class="QStatusBar" name="statusBar"/>
+  <widget class="QDockWidget" name="dockWidget_2">
+   <property name="features">
+    <set>QDockWidget::DockWidgetFloatable|QDockWidget::DockWidgetMovable</set>
+   </property>
+   <property name="windowTitle">
+    <string>Output</string>
+   </property>
+   <attribute name="dockWidgetArea">
+    <number>2</number>
+   </attribute>
+   <widget class="QWidget" name="dockWidgetContents_2">
+    <layout class="QGridLayout" name="gridLayout">
+     <item row="0" column="0">
+      <widget class="QPlainTextEdit" name="plainTextEdit"/>
+     </item>
+    </layout>
+   </widget>
+  </widget>
+  <action name="actionOpenImage">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/document-open.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-open.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Open Image</string>
+   </property>
+   <property name="toolTip">
+    <string>Open an image</string>
+   </property>
+   <property name="shortcut">
+    <string>Ctrl+O</string>
+   </property>
+  </action>
+  <action name="actionPreprocess">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/trim-to-selection.svg</normaloff>:/breeze-icons-master/icons/actions/32/trim-to-selection.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Preprocess</string>
+   </property>
+   <property name="toolTip">
+    <string>Preprocess the image for remove warp etc.</string>
+   </property>
+  </action>
+  <action name="actionRotate_Left">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/edit-undo.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-undo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Left</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate image to left</string>
+   </property>
+  </action>
+  <action name="actionRotate_Right">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/edit-redo.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-redo.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate Right</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate image to right</string>
+   </property>
+  </action>
+  <action name="actionBest_Fit">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/zoom-fit-best.svg</normaloff>:/breeze-icons-master/icons/actions/32/zoom-fit-best.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Best Fit</string>
+   </property>
+   <property name="toolTip">
+    <string>Fits image size to container</string>
+   </property>
+  </action>
+  <action name="actionZoom_In">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/zoom-in.svg</normaloff>:/breeze-icons-master/icons/actions/32/zoom-in.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom In</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom in</string>
+   </property>
+  </action>
+  <action name="actionZoom_Out">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/zoom-out.svg</normaloff>:/breeze-icons-master/icons/actions/32/zoom-out.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Zoom Out</string>
+   </property>
+   <property name="toolTip">
+    <string>Zoom out</string>
+   </property>
+  </action>
+  <action name="actionCopy_to_clipboard">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/document-new.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-new.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Copy to clipboard</string>
+   </property>
+   <property name="toolTip">
+    <string>Copy to clipboard</string>
+   </property>
+  </action>
+  <action name="actionClear_text">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/document-close.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-close.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Clear text</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear textbox</string>
+   </property>
+  </action>
+  <action name="actionRecognize_text">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/document-edit-decrypt-verify.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-edit-decrypt-verify.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Recognize text</string>
+   </property>
+   <property name="toolTip">
+    <string>Recognize text in image</string>
+   </property>
+  </action>
+  <action name="actionRotate">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/view-refresh.svg</normaloff>:/breeze-icons-master/icons/actions/32/view-refresh.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Rotate</string>
+   </property>
+   <property name="toolTip">
+    <string>Rotate the image</string>
+   </property>
+  </action>
+  <action name="actionSettings">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/configure.svg</normaloff>:/breeze-icons-master/icons/actions/32/configure.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Settings</string>
+   </property>
+   <property name="toolTip">
+    <string>Open/close settings panel</string>
+   </property>
+  </action>
+  <action name="actionAbout">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/help-whatsthis.svg</normaloff>:/breeze-icons-master/icons/actions/32/help-whatsthis.svg</iconset>
+   </property>
+   <property name="text">
+    <string>About</string>
+   </property>
+   <property name="toolTip">
+    <string>About &amp; Help</string>
+   </property>
+  </action>
+  <action name="actionAdjust_image">
+   <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/devices/22/drive-multipartition.svg</normaloff>:/breeze-icons-master/icons/devices/22/drive-multipartition.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Adjust image</string>
+   </property>
+   <property name="toolTip">
+    <string>Adjust image brightness, color etc.</string>
+   </property>
+  </action>
+  <action name="actionSave">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/document-save.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-save.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Save</string>
+   </property>
+   <property name="toolTip">
+    <string>Save the output</string>
+   </property>
+  </action>
+  <action name="actionClear_recognize_areas">
+   <property name="icon">
+    <iconset resource="res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/edit-delete-shred.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-delete-shred.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Clear recognize areas</string>
+   </property>
+   <property name="toolTip">
+    <string>Clears the recognize areas</string>
+   </property>
+  </action>
+ </widget>
+ <layoutdefault spacing="6" margin="11"/>
+ <customwidgets>
+  <customwidget>
+   <class>MyGraphicsView</class>
+   <extends>QGraphicsView</extends>
+   <header>mygraphicsview.hpp</header>
+  </customwidget>
+ </customwidgets>
+ <resources>
+  <include location="res.qrc"/>
+ </resources>
+ <connections/>
+</ui>
