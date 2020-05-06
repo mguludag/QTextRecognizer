@@ -5,7 +5,6 @@
 #include "adjustwidget.hpp"
 #include "graphics_view_zoom.hpp"
 #include "mygraphicsview.hpp"
-#include "myicon.hpp"
 #include "mypoint.h"
 #include "mypolyf.hpp"
 #include "myrectf.hpp"
@@ -14,6 +13,8 @@
 #include "rotatewidget.hpp"
 #include "settingswidget.hpp"
 
+#include "ui_mainwindow.h"
+
 #include <QClipboard>
 #include <QElapsedTimer>
 #include <QFileDialog>
@@ -21,13 +22,11 @@
 #include <QList>
 #include <QMainWindow>
 
+#include <QMenu>
 #include <QPixmap>
-#include <QSpacerItem>
 #include <QTextStream>
-#include <QTimer>
 #include <QToolBar>
 #include <QToolTip>
-#include <QtDebug>
 
 #define PI 22 / 7
 
@@ -50,8 +49,6 @@ public:
     void enableDisableActions(QAction *except, bool enabled);
     void drawPolygon();
     void checkPoints();
-    void showPreprocess();
-    void applyPreprocess();
     void removeItems(QGraphicsScene &scene, QString name);
     void addItems();
     QImage getImage(QGraphicsScene &scene, const QRectF &_rect);
@@ -70,11 +67,13 @@ public slots:
     void moveEvent(QMoveEvent *);
 
     void getPoints();
+    void showPreprocess();
+    void applyPreprocess();
+    void autoDetectLayout();
     void hidePopups();
     void rotatePixmap();
     void centerImage();
     void cancelPreprocess();
-    void blinkActionPreprocess();
     void setBrightness();
     void setContrast();
     void setAThreshold();
@@ -86,14 +85,13 @@ public slots:
     void writePos();
     void beginRect();
     void endRect();
-    void setIcons();
     void openImage();
     void getFilename();
     qreal degToRad(qreal deg);
     QRectF getRotatedRect(QRectF _rect);
 
     void on_actionOpenImage_triggered();
-    void on_actionPreprocess_toggled(bool arg1);
+    void on_actionPreprocess_triggered();
     void on_actionRotate_toggled(bool arg1);
     void on_actionBest_Fit_triggered();
     void on_actionZoom_In_triggered();
@@ -105,50 +103,284 @@ public slots:
     void on_actionSave_triggered();
     void on_actionAbout_triggered();
     void on_actionSettings_toggled(bool arg1);
-    void on_actionClear_recognize_areas_triggered();
-private slots:
+    void on_actionAuto_detect_layout_triggered();
+    void on_actionClear_layout_triggered();
 
 private:
     Ui::MainWindow *ui;
     enum icons { light, dark };
     bool isDark = false, isFile = false;
-    bool cancelpreprocess = false, onprogress = false, previewpreproc = false;
+    bool cancelpreprocess = false, onprogress = false, previewpreproc = false, autolayout = false;
     bool state = false;
     bool rem = false;
     bool pressShift = false;
     bool b_cont = true, c_cont = true, at_cont = true, mt_cont = true;
     int key = 0, rects_size = 0;
     double m_angle = 0;
-    QIcon stateicon1, stateicon2;
+    QMenu *m_menu = nullptr, *m_menu_clearlayout;
     QToolBar *m_DockTBar = nullptr;
     QString filename;
     QClipboard *m_clipboard = QGuiApplication::clipboard();
     QPixmap *m_pixmap = nullptr, *t_pixmap = nullptr;
     MyScene *m_scene = nullptr;
     MyPixmapItem *m_pixmapItem = nullptr;
-    QPoint m_mousePos;
     QImage *m_imgQ = nullptr, *m_imgQ_copy = nullptr;
     cv::Mat *m_imgMat = nullptr, *m_imgMat_orig = nullptr, *m_imgMatTh = nullptr;
-    QTimer *m_timer = nullptr;
     QElapsedTimer *m_etimer = nullptr;
-    MyPoint *m_pts[4];
+    MyPoint *m_pts[4] = {nullptr};
     MyPolyF *m_polyf = nullptr;
     MyRectF *m_rect = nullptr;
     QPen m_pen;
     QPen m_pen1;
     QPen m_pen2;
     QBrush m_brush;
-    QVector<QPointF> m_pointQ;
+    QVector<QPointF> m_pointQ = {};
     QList<QImage> *m_images = nullptr;
-    std::vector<cv::Point2f> m_pointStd;
+    std::vector<cv::Point2f> m_pointStd = {};
     Settings *m_settings = nullptr;
     RotateWidget *m_rwidget = nullptr;
     adjustWidget *m_adjWidget = nullptr;
-    PreprocessImage *m_preprocImg = nullptr;
     OCRWidget *m_ocrWidget = nullptr;
-    Graphics_view_zoom *z;
-    SettingsWidget *m_settwidget;
+    Graphics_view_zoom *z = nullptr;
+    SettingsWidget *m_settwidget = nullptr;
     tesseract::TessBaseAPI *tess = nullptr;
+
+public slots:
+    void setIcons()
+    {
+        QIcon icon;
+        isDark = m_settwidget->isdark;
+        if (isDark) {
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/document-open.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionOpenImage->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/trim-margins.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionPreprocess->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/edit-undo.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionRotate_Left->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/edit-redo.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionRotate_Right->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/zoom-fit-best.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionBest_Fit->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/zoom-in.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionZoom_In->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/zoom-out.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionZoom_Out->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/document-new.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionCopy_to_clipboard->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/document-close.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionClear_text->setIcon(icon);
+            icon.addFile(
+                QString::fromUtf8(
+                    ":/breeze-icons-master/icons-dark/actions/32/document-edit-decrypt-verify.svg"),
+                QSize(),
+                QIcon::Normal,
+                QIcon::Off);
+            ui->actionRecognize_text->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/view-refresh.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionRotate->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/configure.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionSettings->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/help-whatsthis.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAbout->setIcon(icon);
+            icon.addFile(
+                QString::fromUtf8(
+                    ":/breeze-icons-master/icons-dark/devices/22/drive-multipartition.svg"),
+                QSize(),
+                QIcon::Normal,
+                QIcon::Off);
+            ui->actionAdjust_image->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/document-save.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionSave->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/dialog-ok-apply.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAccept->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/dialog-cancel.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionCancel->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/trim-to-selection.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAuto_detect_layout->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons-dark/actions/32/edit-delete.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionClear_layout->setIcon(icon);
+        } else {
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/document-open.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionOpenImage->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/trim-margins.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionPreprocess->setIcon(icon);
+            icon.addFile(QString::fromUtf8(":/breeze-icons-master/icons/actions/32/edit-undo.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionRotate_Left->setIcon(icon);
+            icon.addFile(QString::fromUtf8(":/breeze-icons-master/icons/actions/32/edit-redo.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionRotate_Right->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/zoom-fit-best.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionBest_Fit->setIcon(icon);
+            icon.addFile(QString::fromUtf8(":/breeze-icons-master/icons/actions/32/zoom-in.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionZoom_In->setIcon(icon);
+            icon.addFile(QString::fromUtf8(":/breeze-icons-master/icons/actions/32/zoom-out.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionZoom_Out->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/document-new.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionCopy_to_clipboard->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/document-close.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionClear_text->setIcon(icon);
+            icon.addFile(
+                QString::fromUtf8(
+                    ":/breeze-icons-master/icons/actions/32/document-edit-decrypt-verify.svg"),
+                QSize(),
+                QIcon::Normal,
+                QIcon::Off);
+            ui->actionRecognize_text->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/view-refresh.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionRotate->setIcon(icon);
+            icon.addFile(QString::fromUtf8(":/breeze-icons-master/icons/actions/32/configure.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionSettings->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/help-whatsthis.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAbout->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/devices/22/drive-multipartition.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAdjust_image->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/document-save.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionSave->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/dialog-ok-apply.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAccept->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/dialog-cancel.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionCancel->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/trim-to-selection.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionAuto_detect_layout->setIcon(icon);
+            icon.addFile(QString::fromUtf8(
+                             ":/breeze-icons-master/icons/actions/32/edit-delete.svg"),
+                         QSize(),
+                         QIcon::Normal,
+                         QIcon::Off);
+            ui->actionClear_layout->setIcon(icon);
+        }
+    }
+private slots:
 };
 
 #endif // MAINWINDOW_HPP

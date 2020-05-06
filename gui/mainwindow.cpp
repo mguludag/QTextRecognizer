@@ -1,5 +1,4 @@
 #include "mainwindow.hpp"
-#include "ui_mainwindow.h"
 
 #define POPUP_Y 60
 #define ROTATE_POPUP_X 20
@@ -25,6 +24,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(ui->graphicsView, SIGNAL(pressSignal()), this, SLOT(beginRect()));
     connect(ui->graphicsView, SIGNAL(releaseSignal()), this, SLOT(endRect()));
     connect(ui->graphicsView, SIGNAL(moveSignal()), this, SLOT(writePos()));
+    connect(ui->actionAccept, SIGNAL(triggered()), this, SLOT(applyPreprocess()));
+    connect(ui->actionCancel, SIGNAL(triggered()), this, SLOT(cancelPreprocess()));
     connect(m_rwidget, SIGNAL(angleChanged()), this, SLOT(rotatePixmap()));
     connect(m_adjWidget->getBrightness(), SIGNAL(sliderReleased()), this, SLOT(setBrightness()));
     connect(m_adjWidget->getContrast(), SIGNAL(sliderReleased()), this, SLOT(setContrast()));
@@ -33,7 +34,6 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(m_adjWidget->getThreshold(), SIGNAL(sliderReleased()), this, SLOT(setMThreshold()));
     connect(m_adjWidget, SIGNAL(adaptiveThresOK()), this, SLOT(setAThreshold()));
     connect(m_adjWidget, SIGNAL(adaptiveThresCncl()), this, SLOT(setAThreshold()));
-    connect(m_timer, SIGNAL(timeout()), this, SLOT(blinkActionPreprocess()));
     connect(m_ocrWidget, SIGNAL(ocrFinished()), this, SLOT(showResult()));
     connect(m_ocrWidget, SIGNAL(ocrStarted()), this, SLOT(onProgress()));
 }
@@ -44,7 +44,6 @@ MainWindow::~MainWindow()
     delete m_rwidget;
     delete z;
     delete m_settings;
-    delete m_preprocImg;
     delete m_pixmap;
     delete m_scene;
     delete m_imgQ;
@@ -74,9 +73,17 @@ void MainWindow::init()
     m_imgMat = new cv::Mat;
     m_imgMat_orig = new cv::Mat;
     m_imgMatTh = new cv::Mat;
-    m_timer = new QTimer;
     m_etimer = new QElapsedTimer;
     m_images = new QList<QImage>;
+
+    m_menu = new QMenu;
+    m_menu->addAction(ui->actionAccept);
+    m_menu->addAction(ui->actionCancel);
+    ui->actionPreprocess->setMenu(m_menu);
+
+    m_menu_clearlayout = new QMenu;
+    m_menu_clearlayout->addAction(ui->actionClear_layout);
+    ui->actionAuto_detect_layout->setMenu(m_menu_clearlayout);
 
     m_rwidget = new RotateWidget;
     m_rwidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
@@ -98,7 +105,6 @@ void MainWindow::init()
     m_settwidget->setWindowOpacity(0.9);
     m_settwidget->hide();
 
-    m_preprocImg = new PreprocessImage;
     m_pixmap = new QPixmap;
     t_pixmap = new QPixmap;
     m_pixmapItem = new MyPixmapItem;
@@ -227,8 +233,9 @@ void MainWindow::closeEvent(QCloseEvent *event)
     m_rwidget->close();
     m_adjWidget->close();
     m_ocrWidget->close();
+    m_settwidget->close();
     m_settings->writeSettings("Window", "Geometry", saveGeometry());
-    m_settings->writeSettings("Window", "State", saveState());
+    //m_settings->writeSettings("Window", "State", saveState());
     event->accept();
 }
 
@@ -297,10 +304,9 @@ void MainWindow::showPreprocess()
     ui->actionPreprocess->setToolTip(
         "You can drag-drop the corners and/or click this again to apply "
         "transformation or press ESC to cancel");
-    ui->label->setText("You can drag-drop the corners and/or click the Preprocess button again to "
-                       "apply transformation or press ESC to cancel");
+    ui->label->setText(
+        "You can drag-drop the corners and apply transformation or press ESC to cancel");
     enableDisableActions(ui->actionPreprocess, false);
-    m_timer->start(750);
     removeItems(*m_scene, "poly");
     removeItems(*m_scene, "point");
     *m_imgQ = getImage(*m_scene, m_pixmapItem->sceneBoundingRect());
@@ -311,7 +317,7 @@ void MainWindow::showPreprocess()
     }
     if (m_pointQ.size() < 3) {
         *m_imgMat = ConvertImage::qimageToMatRef(*m_imgQ, CV_8UC4);
-        m_pointStd = m_preprocImg->getPoints(*m_imgMat);
+        m_pointStd = PreprocessImage::getPoints(*m_imgMat);
 
         if (m_pointStd.size() > 3) {
             for (auto i : m_pointStd) {
@@ -319,6 +325,7 @@ void MainWindow::showPreprocess()
                     QPointF(static_cast<double>(i.x) / 1.92, static_cast<double>(i.y) / 1.92));
             }
 
+            drawPolygon();
             checkPoints();
             drawPolygon();
             addItems();
@@ -330,7 +337,7 @@ void MainWindow::showPreprocess()
 void MainWindow::applyPreprocess()
 {
     previewpreproc = false;
-    m_timer->stop();
+    ui->actionPreprocess->setChecked(false);
     ui->actionPreprocess->setToolTip("Preprocess the image for remove warp etc.");
     ui->label->setText("Ready");
     if (!cancelpreprocess) {
@@ -343,13 +350,13 @@ void MainWindow::applyPreprocess()
         for (auto i : m_pointQ) {
             m_pointStd.push_back(cv::Point2f(static_cast<float>(i.x()), static_cast<float>(i.y())));
         }
-        m_preprocImg->setPoints(m_pointStd);
+        PreprocessImage::setPoints(m_pointStd);
         if (m_imgQ->width() > 10) {
             removeItems(*m_scene, "point");
             removeItems(*m_scene, "poly");
             m_scene->removeItem(m_pixmapItem);
             *m_imgMat = ConvertImage::qimageToMatRef(*m_imgQ, CV_8UC4);
-            *m_imgMat = m_preprocImg->deskewRotate(*m_imgMat);
+            *m_imgMat = PreprocessImage::deskewRotate(*m_imgMat);
             *m_imgQ = ConvertImage::matToQimage(*m_imgMat, QImage::Format_ARGB32);
             *m_pixmap = QPixmap::fromImage(*m_imgQ);
             m_pixmapItem->setPixmap(*m_pixmap);
@@ -361,6 +368,70 @@ void MainWindow::applyPreprocess()
     }
     ui->graphicsView->rotate(*m_pixmapItem, *m_scene, 0);
     ui->graphicsView->fitInView(m_scene->sceneRect(), Qt::KeepAspectRatio);
+}
+
+// This func taken from gImageReader source and I modified a little
+void MainWindow::autoDetectLayout()
+{
+    removeItems(*m_scene, "rect");
+    double avgDeskew = 0.0;
+    int nDeskew = 0;
+    QList<QRectF> rects;
+    rects_size = 0;
+    QImage img = getImage(*m_scene, m_pixmapItem->sceneBoundingRect());
+    tesseract::TessBaseAPI tess;
+    tess.InitForAnalysePage();
+    tess.SetPageSegMode(tesseract::PSM_AUTO_ONLY);
+    tess.SetImage(img.bits(), img.width(), img.height(), 4, img.bytesPerLine());
+    tesseract::PageIterator *it = tess.AnalyseLayout();
+    if (it && !it->Empty(tesseract::RIL_BLOCK)) {
+        do {
+            int x1, y1, x2, y2;
+            tesseract::Orientation orient;
+            tesseract::WritingDirection wdir;
+            tesseract::TextlineOrder tlo;
+            float deskew;
+            it->BoundingBox(tesseract::RIL_BLOCK, &x1, &y1, &x2, &y2);
+            it->Orientation(&orient, &wdir, &tlo, &deskew);
+            avgDeskew += static_cast<double>(deskew);
+            ++nDeskew;
+            float width = 2 + x2 - x1, height = 2 + y2 - y1;
+            if (width > 10 && height > 10) {
+                rects.append(
+                    QRectF(x1 - 1, y1 - 1, static_cast<double>(width), static_cast<double>(height)));
+            }
+        } while (it->Next(tesseract::RIL_BLOCK));
+    }
+    delete it;
+
+    avgDeskew = qRound(((avgDeskew / nDeskew) / CV_PI * 180.0) * 10.0) / 10.0;
+    if (std::abs(avgDeskew) > 0.1) {
+        double newangle = m_rwidget->getDSpinBox()->value() - avgDeskew;
+        m_rwidget->getDSpinBox()->setValue(newangle);
+    } else {
+        for (int i = rects.size(); i-- > 1;) {
+            for (int j = i; j-- > 0;) {
+                if (rects[j].intersects(rects[i])) {
+                    rects[j] = rects[j].united(rects[i]);
+                    rects.removeAt(i);
+                    break;
+                }
+            }
+        }
+        for (int i = 0, n = rects.size(); i < n; ++i) {
+            m_rect = new MyRectF(m_scene,
+                                 rects[i].topLeft(),
+                                 rects[i].bottomRight(),
+                                 ++rects_size,
+                                 m_pixmapItem->sceneBoundingRect());
+            m_scene->addItem(m_rect);
+            m_scene->items().first()->setData(0, "rect");
+            m_scene->items().first()->setData(1, m_rect->getRect());
+            m_scene->items().first()->setData(2, rects_size);
+        }
+    }
+    tess.Clear();
+    tess.End();
 }
 
 void MainWindow::drawPolygon()
@@ -394,7 +465,7 @@ void MainWindow::checkPoints()
     if (!m_pixmapItem->contains(m_pointQ.at(3)))
         m_pointQ[3] = m_pixmapItem->sceneBoundingRect().bottomRight();
 
-    if (m_polyf->shape().length() < m_pixmapItem->pixmap().rect().height() * 0.5) {
+    if (m_polyf->shape().length() < m_pixmapItem->pixmap().rect().height() * 0.05) {
         m_pointQ[0] = m_pixmapItem->sceneBoundingRect().bottomLeft();
         m_pointQ[1] = m_pixmapItem->sceneBoundingRect().topLeft();
         m_pointQ[2] = m_pixmapItem->sceneBoundingRect().topRight();
@@ -478,22 +549,13 @@ void MainWindow::cancelPreprocess()
     m_scene->update();
 }
 
-void MainWindow::blinkActionPreprocess()
-{
-    if (state)
-        ui->actionPreprocess->setIcon(stateicon1);
-    else
-        ui->actionPreprocess->setIcon(stateicon2);
-    state = !state;
-}
-
 void MainWindow::setBrightness()
 {
     int value = m_adjWidget->getBrightness()->value();
     if (b_cont)
-        *m_imgMat = m_preprocImg->adjustBrightness(*m_imgMat_orig, value);
+        *m_imgMat = PreprocessImage::adjustBrightness(*m_imgMat_orig, value);
     else
-        *m_imgMat = m_preprocImg->adjustBrightness(*m_imgMat, value);
+        *m_imgMat = PreprocessImage::adjustBrightness(*m_imgMat, value);
     c_cont = false;
     at_cont = false;
     mt_cont = false;
@@ -508,9 +570,9 @@ void MainWindow::setContrast()
 {
     double value = m_adjWidget->getContrast()->value() / 10;
     if (c_cont)
-        *m_imgMat = m_preprocImg->adjustContrast(*m_imgMat_orig, value);
+        *m_imgMat = PreprocessImage::adjustContrast(*m_imgMat_orig, value);
     else
-        *m_imgMat = m_preprocImg->adjustContrast(*m_imgMat, value);
+        *m_imgMat = PreprocessImage::adjustContrast(*m_imgMat, value);
     b_cont = false;
     at_cont = false;
     mt_cont = false;
@@ -524,7 +586,7 @@ void MainWindow::setContrast()
 void MainWindow::setAThreshold()
 {
     if (m_adjWidget->getIsAdaptive()) {
-        m_preprocImg->adaptThreshold(*m_imgMat, false, 3, 1);
+        PreprocessImage::adaptThreshold(*m_imgMat, false, 3, 1);
     } else
         *m_imgMat = *m_imgMatTh;
     b_cont = false;
@@ -540,9 +602,9 @@ void MainWindow::setMThreshold()
 {
     int value = m_adjWidget->getThreshold()->value();
     if (mt_cont)
-        *m_imgMat = m_preprocImg->manualThreshold(*m_imgMat_orig, value, 1);
+        *m_imgMat = PreprocessImage::manualThreshold(*m_imgMat_orig, value, 1);
     else
-        *m_imgMat = m_preprocImg->manualThreshold(*m_imgMat, value, 1);
+        *m_imgMat = PreprocessImage::manualThreshold(*m_imgMat, value, 1);
     b_cont = false;
     c_cont = false;
     at_cont = false;
@@ -658,12 +720,6 @@ void MainWindow::endRect()
     }
 }
 
-void MainWindow::setIcons()
-{
-    isDark = m_settwidget->isdark;
-    MyIcon::setIcons(ui, isDark);
-}
-
 QPointF MainWindow::getRotatedPoint(QPointF p, QPointF center, qreal angleRads)
 {
     qreal x = p.x();
@@ -718,6 +774,7 @@ QRectF MainWindow::getRotatedRect(QRectF _rect)
     return rotatedRect;
 }
 
+// ACTIONS BEGIN
 void MainWindow::on_actionOpenImage_triggered()
 {
     filename = QFileDialog::getOpenFileName(this,
@@ -727,56 +784,12 @@ void MainWindow::on_actionOpenImage_triggered()
     openImage();
 }
 
-void MainWindow::on_actionPreprocess_toggled(bool arg1)
+void MainWindow::on_actionPreprocess_triggered()
 {
-    QIcon icon1;
-
-    if (arg1) {
+    if (!previewpreproc)
         showPreprocess();
-        if (isDark) {
-            icon1.addFile(QString::fromUtf8(
-                              ":/breeze-icons-master/icons-dark/actions/32/trim-margins.svg"),
-                          QSize(),
-                          QIcon::Normal,
-                          QIcon::Off);
-            stateicon2
-                .addFile(QString::fromUtf8(
-                             ":/breeze-icons-master/icons-dark/actions/32/trim-to-selection.svg"),
-                         QSize(),
-                         QIcon::Disabled,
-                         QIcon::Off);
-        } else {
-            icon1.addFile(QString::fromUtf8(
-                              ":/breeze-icons-master/icons/actions/32/trim-margins.svg"),
-                          QSize(),
-                          QIcon::Normal,
-                          QIcon::Off);
-            stateicon2.addFile(QString::fromUtf8(
-                                   ":/breeze-icons-master/icons/actions/32/trim-to-selection.svg"),
-                               QSize(),
-                               QIcon::Disabled,
-                               QIcon::Off);
-        }
-
-    } else {
-        applyPreprocess();
-        if (isDark) {
-            icon1.addFile(QString::fromUtf8(
-                              ":/breeze-icons-master/icons-dark/actions/32/trim-to-selection.svg"),
-                          QSize(),
-                          QIcon::Normal,
-                          QIcon::Off);
-        } else {
-            icon1.addFile(QString::fromUtf8(
-                              ":/breeze-icons-master/icons/actions/32/trim-to-selection.svg"),
-                          QSize(),
-                          QIcon::Normal,
-                          QIcon::Off);
-        }
-    }
-
-    ui->actionPreprocess->setIcon(icon1);
-    stateicon1 = icon1;
+    else
+        ui->actionPreprocess->menu()->popup(QCursor::pos());
 }
 
 void MainWindow::on_actionRotate_toggled(bool arg1)
@@ -905,7 +918,15 @@ void MainWindow::on_actionSettings_toggled(bool arg1)
         m_settwidget->hide();
 }
 
-void MainWindow::on_actionClear_recognize_areas_triggered()
+void MainWindow::on_actionAuto_detect_layout_triggered()
+{
+    if (!autolayout && rects_size < 1)
+        autoDetectLayout();
+    else
+        ui->actionAuto_detect_layout->menu()->popup(QCursor::pos());
+}
+
+void MainWindow::on_actionClear_layout_triggered()
 {
     removeItems(*m_scene, "rect");
     rects_size = 0;

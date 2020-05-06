@@ -10,7 +10,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = qtextrecognizer
 TEMPLATE = app
-INCLUDEPATH += gui
+INCLUDEPATH += gui \
+              improcessing
 
 win32-*{
 include(C:/opencv/opencv410.pri)
@@ -42,7 +43,6 @@ SOURCES += \
         gui/graphics_view_zoom.cpp \
         gui/mainwindow.cpp \
         gui/mygraphicsview.cpp \
-        gui/myicon.cpp \
         gui/mypixmapitem.cpp \
         gui/mypoint.cpp \
         gui/mypolyf.cpp \
@@ -61,7 +61,6 @@ HEADERS += \
         gui/graphics_view_zoom.hpp \
         gui/mainwindow.hpp \
         gui/mygraphicsview.hpp \
-        gui/myicon.hpp \
         gui/mypixmapitem.hpp \
         gui/mypoint.h \
         gui/mypolyf.hpp \

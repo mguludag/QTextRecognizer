@@ -13,6 +13,8 @@ OCRWidget::OCRWidget(QWidget *parent) :
 
 OCRWidget::~OCRWidget()
 {
+    delete m_settings;
+    delete tess;
     delete ui;
 }
 

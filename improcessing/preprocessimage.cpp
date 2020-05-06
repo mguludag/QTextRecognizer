@@ -140,13 +140,13 @@ std::vector<cv::Point2f> PreprocessImage::getPoints(cv::Mat &src)
     std::vector<cv::Point2f> src_;
     std::vector<cv::Point2f> dst_;
     std::vector<std::vector<cv::Point>> contours;
-    std::vector<cv::Vec4i> hierarchy;
+    std::vector<cv::Vec4i> hierarchy = {};
     std::vector<std::vector<cv::Point>> approx;
 
     if (!src.empty()) {
         double ratio = src.rows / 500.0;
         preProcess(src, edged);
-        cv::findContours(edged, contours, hierarchy, cv::RETR_CCOMP, cv::CHAIN_APPROX_SIMPLE);
+        cv::findContours(edged, contours, hierarchy, cv::RETR_LIST, cv::CHAIN_APPROX_SIMPLE);
         approx.resize(contours.size());
         size_t i, j;
         for (i = 0; i < contours.size(); i++) {
@@ -203,16 +203,16 @@ void PreprocessImage::setPoints(std::vector<cv::Point2f> pt)
 
 void PreprocessImage::preProcess(cv::Mat &src, cv::Mat &dst)
 {
-    cv::Mat imageGrayed, gray;
+    cv::Mat imageGrayed;
     cv::Mat imageOpen, imageClosed, imageBlurred;
 
-    cv::cvtColor(src, gray, cv::COLOR_BGRA2GRAY);
+    cv::cvtColor(src, imageGrayed, cv::COLOR_BGRA2GRAY);
 
-    cv::adaptiveThreshold(gray,
+    cv::adaptiveThreshold(imageGrayed,
                           imageGrayed,
                           255,
                           cv::ADAPTIVE_THRESH_GAUSSIAN_C,
-                          cv::THRESH_BINARY_INV,
+                          cv::THRESH_BINARY,
                           25,
                           4);
 

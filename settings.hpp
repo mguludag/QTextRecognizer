@@ -13,7 +13,7 @@
 class Settings
 {
     uint8_t style = 2;
-    QSettings *s;
+    QSettings *s = nullptr;
 
 public:
     enum Theme { vista, classic, lightFusion, darkFusion };

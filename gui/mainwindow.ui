@@ -14,21 +14,24 @@
    <string>QTextRecognizer</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="res.qrc">
+   <iconset resource="../res.qrc">
     <normaloff>:/breeze-icons-master/icons-dark/preferences/32/preferences-releasenotes.svg</normaloff>:/breeze-icons-master/icons-dark/preferences/32/preferences-releasenotes.svg</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QGridLayout" name="gridLayout_2">
-    <item row="1" column="0">
-     <widget class="QLabel" name="label">
+    <item row="2" column="0">
+     <widget class="QLabel" name="label_2">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
+       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="text">
-       <string>Ready</string>
+       <string/>
+      </property>
+      <property name="alignment">
+       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
       </property>
      </widget>
     </item>
@@ -51,19 +54,16 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_2">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label">
       <property name="sizePolicy">
-       <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
+       <sizepolicy hsizetype="Expanding" vsizetype="Preferred">
         <horstretch>0</horstretch>
         <verstretch>0</verstretch>
        </sizepolicy>
       </property>
       <property name="text">
-       <string/>
-      </property>
-      <property name="alignment">
-       <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+       <string>Ready</string>
       </property>
      </widget>
     </item>
@@ -75,7 +75,7 @@
      <x>0</x>
      <y>0</y>
      <width>800</width>
-     <height>21</height>
+     <height>20</height>
     </rect>
    </property>
   </widget>
@@ -104,7 +104,7 @@
    <addaction name="separator"/>
    <addaction name="actionAdjust_image"/>
    <addaction name="separator"/>
-   <addaction name="actionClear_recognize_areas"/>
+   <addaction name="actionAuto_detect_layout"/>
    <addaction name="actionRecognize_text"/>
    <addaction name="separator"/>
   </widget>
@@ -129,7 +129,7 @@
   </widget>
   <action name="actionOpenImage">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/document-open.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-open.svg</iconset>
    </property>
    <property name="text">
@@ -143,12 +143,9 @@
    </property>
   </action>
   <action name="actionPreprocess">
-   <property name="checkable">
-    <bool>true</bool>
-   </property>
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/breeze-icons-master/icons/actions/32/trim-to-selection.svg</normaloff>:/breeze-icons-master/icons/actions/32/trim-to-selection.svg</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/trim-margins.svg</normaloff>:/breeze-icons-master/icons/actions/32/trim-margins.svg</iconset>
    </property>
    <property name="text">
     <string>Deskew Image</string>
@@ -156,10 +153,16 @@
    <property name="toolTip">
     <string>Preprocess the image for remove warp etc.</string>
    </property>
+   <property name="menuRole">
+    <enum>QAction::ApplicationSpecificRole</enum>
+   </property>
+   <property name="shortcutVisibleInContextMenu">
+    <bool>true</bool>
+   </property>
   </action>
   <action name="actionRotate_Left">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/edit-undo.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-undo.svg</iconset>
    </property>
    <property name="text">
@@ -171,7 +174,7 @@
   </action>
   <action name="actionRotate_Right">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/edit-redo.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-redo.svg</iconset>
    </property>
    <property name="text">
@@ -183,7 +186,7 @@
   </action>
   <action name="actionBest_Fit">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/zoom-fit-best.svg</normaloff>:/breeze-icons-master/icons/actions/32/zoom-fit-best.svg</iconset>
    </property>
    <property name="text">
@@ -195,7 +198,7 @@
   </action>
   <action name="actionZoom_In">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/zoom-in.svg</normaloff>:/breeze-icons-master/icons/actions/32/zoom-in.svg</iconset>
    </property>
    <property name="text">
@@ -207,7 +210,7 @@
   </action>
   <action name="actionZoom_Out">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/zoom-out.svg</normaloff>:/breeze-icons-master/icons/actions/32/zoom-out.svg</iconset>
    </property>
    <property name="text">
@@ -219,7 +222,7 @@
   </action>
   <action name="actionCopy_to_clipboard">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/document-new.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-new.svg</iconset>
    </property>
    <property name="text">
@@ -231,7 +234,7 @@
   </action>
   <action name="actionClear_text">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/document-close.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-close.svg</iconset>
    </property>
    <property name="text">
@@ -246,7 +249,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/document-edit-decrypt-verify.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-edit-decrypt-verify.svg</iconset>
    </property>
    <property name="text">
@@ -261,7 +264,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/view-refresh.svg</normaloff>:/breeze-icons-master/icons/actions/32/view-refresh.svg</iconset>
    </property>
    <property name="text">
@@ -276,7 +279,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/configure.svg</normaloff>:/breeze-icons-master/icons/actions/32/configure.svg</iconset>
    </property>
    <property name="text">
@@ -288,7 +291,7 @@
   </action>
   <action name="actionAbout">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/help-whatsthis.svg</normaloff>:/breeze-icons-master/icons/actions/32/help-whatsthis.svg</iconset>
    </property>
    <property name="text">
@@ -303,7 +306,7 @@
     <bool>true</bool>
    </property>
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/devices/22/drive-multipartition.svg</normaloff>:/breeze-icons-master/icons/devices/22/drive-multipartition.svg</iconset>
    </property>
    <property name="text">
@@ -315,7 +318,7 @@
   </action>
   <action name="actionSave">
    <property name="icon">
-    <iconset resource="res.qrc">
+    <iconset resource="../res.qrc">
      <normaloff>:/breeze-icons-master/icons/actions/32/document-save.svg</normaloff>:/breeze-icons-master/icons/actions/32/document-save.svg</iconset>
    </property>
    <property name="text">
@@ -325,16 +328,52 @@
     <string>Save the output</string>
    </property>
   </action>
-  <action name="actionClear_recognize_areas">
+  <action name="actionAuto_detect_layout">
    <property name="icon">
-    <iconset resource="res.qrc">
-     <normaloff>:/breeze-icons-master/icons/actions/32/edit-delete-shred.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-delete-shred.svg</iconset>
+    <iconset resource="../res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/trim-to-selection.svg</normaloff>:/breeze-icons-master/icons/actions/32/trim-to-selection.svg</iconset>
    </property>
    <property name="text">
-    <string>Clear recognize areas</string>
+    <string>Autodetect layout</string>
    </property>
    <property name="toolTip">
-    <string>Clears the recognize areas</string>
+    <string>Auto detect the text regions</string>
+   </property>
+  </action>
+  <action name="actionAccept">
+   <property name="icon">
+    <iconset resource="../res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/dialog-ok-apply.svg</normaloff>:/breeze-icons-master/icons/actions/32/dialog-ok-apply.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Accept</string>
+   </property>
+   <property name="toolTip">
+    <string>Accept the corners and crop</string>
+   </property>
+  </action>
+  <action name="actionCancel">
+   <property name="icon">
+    <iconset resource="../res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/dialog-cancel.svg</normaloff>:/breeze-icons-master/icons/actions/32/dialog-cancel.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Cancel</string>
+   </property>
+   <property name="toolTip">
+    <string>Cancel the corner detection process</string>
+   </property>
+  </action>
+  <action name="actionClear_layout">
+   <property name="icon">
+    <iconset resource="../res.qrc">
+     <normaloff>:/breeze-icons-master/icons/actions/32/edit-delete.svg</normaloff>:/breeze-icons-master/icons/actions/32/edit-delete.svg</iconset>
+   </property>
+   <property name="text">
+    <string>Clear layout</string>
+   </property>
+   <property name="toolTip">
+    <string>Clear the selected or auto detected layout</string>
    </property>
   </action>
  </widget>
@@ -347,7 +386,7 @@
   </customwidget>
  </customwidgets>
  <resources>
-  <include location="res.qrc"/>
+  <include location="../res.qrc"/>
  </resources>
  <connections/>
 </ui>
