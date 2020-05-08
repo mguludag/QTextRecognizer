@@ -226,6 +226,7 @@ QString OCRWidget::getResult() const
 
 void OCRWidget::closeEvent(QCloseEvent *event)
 {
+    event->ignore();
     getSelection();
     m_settings->writeSettings("Lang", "Selected", langs);
     m_settings->writeSettings("Lang", "Dir", directory);

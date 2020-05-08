@@ -17,6 +17,7 @@ MainWindow::MainWindow(QWidget *parent) :
     initMainTbar();
     initPoints();
     initDrawTools();
+    setIcons();
 
     connect(ui->graphicsView, SIGNAL(releaseSignal()), this, SLOT(hidePopups()));
     connect(m_scene, SIGNAL(drop()), this, SLOT(getFilename()));
@@ -63,10 +64,6 @@ void MainWindow::init()
     m_settings = new Settings(Settings::regFormat, "mguludag");
     //restoreState(m_settings->readSettings("Window", "State").toByteArray());
     restoreGeometry(m_settings->readSettings("Window", "Geometry").toByteArray());
-    if (m_settings->loadStyle() == 3) {
-        m_settwidget->isdark = true;
-        setIcons();
-    }
 
     m_imgQ = new QImage;
     m_imgQ_copy = new QImage;
