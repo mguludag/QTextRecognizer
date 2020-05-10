@@ -13,8 +13,6 @@ OCRWidget::OCRWidget(QWidget *parent) :
 
 OCRWidget::~OCRWidget()
 {
-    delete m_settings;
-    delete tess;
     delete ui;
 }
 
@@ -37,7 +35,7 @@ void OCRWidget::init()
     ui->lineEdit_whitelist->setText(m_settings->readSettings("OCR", "Whitelist").toString());
 
     thread = QThread::create([&] { checkLangs(); });
-    connect(thread, SIGNAL(finished()), this, SLOT(initLangModel()));
+    connect(thread, SIGNAL(finished()), this, SLOT(initSelLangs()));
     thread->start();
 }
 
@@ -98,11 +96,19 @@ void OCRWidget::initLangModel()
             }
         }
     }
+    selLang = m_settings->readSettings("Lang", "Selected").toString().split('+');
+}
+
+void OCRWidget::clearResult()
+{
+    result.clear();
+}
+
+void OCRWidget::initSelLangs()
+{
     ui->treeView->setModel(m_mdllng);
     ui->treeView->header()->resizeSection(0, 130);
     ui->treeView->header()->resizeSection(1, 60);
-
-    selLang = m_settings->readSettings("Lang", "Selected").toString().split('+');
 
     for (auto &index : selLang) {
         for (auto data : m_mdllng->findItems(index, Qt::MatchExactly, 1)) {
@@ -115,21 +121,16 @@ void OCRWidget::initLangModel()
     }
 }
 
-void OCRWidget::clearResult()
-{
-    result.clear();
-}
-
 void OCRWidget::checkLangs()
 {
     QDir dir(directory);
-
     dir.setFilter(QDir::Files);
     QStringList filters;
     filters << "*.traineddata";
     dir.setNameFilters(filters);
-
     fileList = dir.entryInfoList();
+
+    initLangModel();
 }
 
 void OCRWidget::setImage(QImage img)

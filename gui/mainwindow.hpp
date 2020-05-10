@@ -143,7 +143,7 @@ private:
     OCRWidget *m_ocrWidget = nullptr;
     Graphics_view_zoom *z = nullptr;
     SettingsWidget *m_settwidget = nullptr;
-    tesseract::TessBaseAPI *tess = nullptr;
+    //tesseract::TessBaseAPI *tess = nullptr;
 
 public slots:
     void setIcons()

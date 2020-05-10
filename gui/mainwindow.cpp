@@ -13,8 +13,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     init();
-    initDockTBar();
     initMainTbar();
+    initDockTBar();
     initPoints();
     initDrawTools();
     setIcons();
@@ -72,44 +72,31 @@ void MainWindow::init()
     m_imgMatTh = new cv::Mat;
     m_etimer = new QElapsedTimer;
     m_images = new QList<QImage>;
-
-    m_menu = new QMenu;
-    m_menu->addAction(ui->actionAccept);
-    m_menu->addAction(ui->actionCancel);
-    ui->actionPreprocess->setMenu(m_menu);
-
-    m_menu_clearlayout = new QMenu;
-    m_menu_clearlayout->addAction(ui->actionClear_layout);
-    ui->actionAuto_detect_layout->setMenu(m_menu_clearlayout);
-
-    m_rwidget = new RotateWidget;
-    m_rwidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-    m_rwidget->setWindowOpacity(0.9);
-    m_rwidget->hide();
-
-    m_adjWidget = new adjustWidget;
-    m_adjWidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-    m_adjWidget->setWindowOpacity(0.9);
-    m_adjWidget->hide();
-
-    m_ocrWidget = new OCRWidget;
-    m_ocrWidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-    m_ocrWidget->setWindowOpacity(0.9);
-    m_ocrWidget->hide();
-
-    m_settwidget = new SettingsWidget;
-    m_settwidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
-    m_settwidget->setWindowOpacity(0.9);
-    m_settwidget->hide();
-
     m_pixmap = new QPixmap;
     t_pixmap = new QPixmap;
     m_pixmapItem = new MyPixmapItem;
     m_scene = new MyScene;
     ui->graphicsView->setScene(m_scene);
     ui->graphicsView->setMouseTracking(true);
-
     m_pixmapItem->setTransformationMode(Qt::SmoothTransformation);
+    ui->statusBar->addWidget(ui->label);
+    ui->statusBar->addPermanentWidget(ui->label_2);
+
+    m_rwidget = new RotateWidget;
+    m_rwidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+    m_rwidget->setWindowOpacity(0.9);
+
+    m_adjWidget = new adjustWidget;
+    m_adjWidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+    m_adjWidget->setWindowOpacity(0.9);
+
+    m_ocrWidget = new OCRWidget;
+    m_ocrWidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+    m_ocrWidget->setWindowOpacity(0.9);
+
+    m_settwidget = new SettingsWidget;
+    m_settwidget->setWindowFlags(Qt::FramelessWindowHint | Qt::Tool);
+    m_settwidget->setWindowOpacity(0.9);
 }
 
 void MainWindow::initMainTbar()
@@ -121,6 +108,15 @@ void MainWindow::initMainTbar()
     ui->mainToolBar->addAction(ui->actionAbout);
     enableDisableActions(ui->actionOpenImage, false);
     ui->actionOpenImage->setEnabled(true);
+
+    m_menu = new QMenu;
+    m_menu->addAction(ui->actionAccept);
+    m_menu->addAction(ui->actionCancel);
+    ui->actionPreprocess->setMenu(m_menu);
+
+    m_menu_clearlayout = new QMenu;
+    m_menu_clearlayout->addAction(ui->actionClear_layout);
+    ui->actionAuto_detect_layout->setMenu(m_menu_clearlayout);
 }
 
 void MainWindow::initDockTBar()
@@ -155,11 +151,6 @@ void MainWindow::initDrawTools()
     m_pen1.setColor(Qt::white);
     m_brush.setStyle(Qt::BrushStyle::NoBrush);
     m_brush.setColor(Qt::red);
-
-    ui->statusBar->addWidget(ui->label);
-
-    ui->statusBar->addPermanentWidget(ui->label_2);
-
     m_pen.setWidth(4);
     m_pen1.setWidth(6);
 }

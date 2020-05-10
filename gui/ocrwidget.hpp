@@ -57,6 +57,7 @@ signals:
 public slots:
     void initLangModel();
     void clearResult();
+    void initSelLangs();
 
 private slots:
     void on_pushButton_clicked();
@@ -64,7 +65,7 @@ private slots:
 private:
     Ui::OCRWidget *ui;
     QImage *m_ocrImg = nullptr;
-    QThread *thread, *thread1;
+    QThread *thread, *thread1, *thread2;
     tesseract::TessBaseAPI *tess = nullptr;
     QStandardItemModel *m_mdllng = nullptr, *m_mdlpsm = nullptr;
     QMap<QString, QString> *m_maplng = nullptr;
