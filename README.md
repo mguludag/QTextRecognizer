@@ -1,7 +1,7 @@
 # QTextRecognizer
 A gui for tesseractOCR with some preprocessing image options with OpenCV for better recognize text from images
 
-[Download (for Windows (vc15_x86))]()
+[Download (for Windows (vc15_x86))](https://github.com/mguludag/QTextRecognizer/releases/download/1.0.2/qtextrecognizer_vc15_x86.7z)
 
 #### Additional downloads
 
@@ -25,7 +25,7 @@ A gui for tesseractOCR with some preprocessing image options with OpenCV for bet
 
 ## Screenshots
 
-![Main screen](img\1.png)
+![Main screen](img/1.png)
 
 ![Rotate image screen](img/2.png)
 
