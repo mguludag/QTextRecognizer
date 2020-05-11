@@ -1,7 +1,7 @@
 # QTextRecognizer
 A gui for tesseractOCR with some preprocessing image options with OpenCV for better recognize text from images
 
-![GitHub All Releases](https://img.shields.io/github/downloads/mguludag/QTextRecognizer/total) ![GitHub Releases](https://img.shields.io/github/downloads/mguludag/QTextRecognizer/latest/total)
+![GitHub top language](https://img.shields.io/github/languages/top/mguludag/QTextRecognizer) ![GitHub All Releases](https://img.shields.io/github/downloads/mguludag/QTextRecognizer/total) ![GitHub Releases](https://img.shields.io/github/downloads/mguludag/QTextRecognizer/latest/total) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/mguludag/QTextRecognizer) ![GitHub Release Date](https://img.shields.io/github/release-date/mguludag/QTextRecognizer)
 
 [Download latest version (for Windows (vc15_x86))](https://github.com/mguludag/QTextRecognizer/releases/download/1.0.3/qtextrecognizer_vc15_x86.7z) 
 
