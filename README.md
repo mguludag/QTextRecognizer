@@ -3,7 +3,7 @@ A gui for tesseractOCR with some preprocessing image options with OpenCV for bet
 
 ![GitHub top language](https://img.shields.io/github/languages/top/mguludag/QTextRecognizer) ![GitHub All Releases](https://img.shields.io/github/downloads/mguludag/QTextRecognizer/total) ![GitHub Releases](https://img.shields.io/github/downloads/mguludag/QTextRecognizer/latest/total) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/mguludag/QTextRecognizer) ![GitHub Release Date](https://img.shields.io/github/release-date/mguludag/QTextRecognizer)
 
-<a href="https://github.com/mguludag/QTextRecognizer/releases/latest/download/qtextrecognizer_vc15_x86.7z"><img alt="GitHub Releases" src="https://img.shields.io/github/downloads/mguludag/QTextRecognizer/latest/total?label=Download%20Latest%20Version%20CV15x86&style=for-the-badge">
+<a href="https://github.com/mguludag/QTextRecognizer/releases/latest/download/qtextrecognizer_vc15_x86.7z"><img alt="GitHub Releases" src="https://img.shields.io/github/downloads/mguludag/QTextRecognizer/latest/total?label=Download%20Latest%20Version%20VC15%20x86&style=for-the-badge">
 
 #### Additional downloads
 
