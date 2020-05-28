@@ -34,17 +34,16 @@ void SettingsWidget::closeEvent(QCloseEvent *event)
 void SettingsWidget::on_toolButton_clicked()
 {
     directory = QFileDialog::getExistingDirectory(this, "Select tessdata folder", directory);
-    ui->lineEdit_dir->setText(directory);
-    m_settings->writeSettings("Lang", "Dir", directory);
+    if (!directory.isEmpty()) {
+        ui->lineEdit_dir->setText(directory);
+        m_settings->writeSettings("Lang", "Dir", directory);
+    }
 }
 
 void SettingsWidget::on_comboBox_currentIndexChanged(int index)
 {
     theme = index;
     m_settings->setStyle(index);
-    if (index == 3)
-        isdark = true;
-    else
-        isdark = false;
+    (index == 3) ? isdark = true : isdark = false;
     emit style();
 }

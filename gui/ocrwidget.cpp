@@ -25,6 +25,12 @@ void OCRWidget::init()
     m_settings = new Settings(Settings::regFormat, "mguludag");
     qRegisterMetaType<QItemSelection>("QSelectionModel");
 
+    m_mdllng = new QStandardItemModel(0, 2);
+    m_mdllng->setHeaderData(0, Qt::Horizontal, "Language");
+    m_mdllng->setHeaderData(1, Qt::Horizontal, "Code");
+
+    m_maplng = new QMap<QString, QString>;
+
     if (m_settings->readSettings("Lang", "Dir").toString().isEmpty())
         directory = QApplication::applicationDirPath() + "/tessdata/";
     else
@@ -70,12 +76,6 @@ void OCRWidget::initPSMModel()
 
 void OCRWidget::initLangModel()
 {
-    m_mdllng = new QStandardItemModel(0, 2);
-    m_mdllng->setHeaderData(0, Qt::Horizontal, "Language");
-    m_mdllng->setHeaderData(1, Qt::Horizontal, "Code");
-
-    m_maplng = new QMap<QString, QString>;
-
     QString val;
     QFile file;
     file.setFileName(":/lang.json");
@@ -167,7 +167,6 @@ void OCRWidget::startOCR()
                 *m_ocrImg = ConvertImage::matToQimageRef(*m_imgMat, QImage::Format_RGBA8888);
             } else
                 *m_ocrImg = var;
-            var.save("qqqq.png");
             tess->SetImage(m_ocrImg->bits(),
                            m_ocrImg->width(),
                            m_ocrImg->height(),
