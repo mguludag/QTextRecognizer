@@ -1,11 +1,7 @@
 /*****************************************************************************
  * aboutdialog.hpp
  *
-<<<<<<< HEAD
  * Created: 5/28/2020 2020 by mguludag
-=======
- * Created: 5/4/2020 2020 by mguludag
->>>>>>> d452142a402df0e79f32ec56c2e5cc5095b8df92
  *
  * Copyright 2020 mguludag. All rights reserved.
  *
@@ -28,10 +24,6 @@
  * OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *****************************************************************************/
-<<<<<<< HEAD
-=======
-
->>>>>>> d452142a402df0e79f32ec56c2e5cc5095b8df92
 #ifndef ABOUTDIALOG_HPP
 #define ABOUTDIALOG_HPP
 
