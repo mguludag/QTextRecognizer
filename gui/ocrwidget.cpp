@@ -102,27 +102,34 @@ void OCRWidget::initPSMModel()
 
 void OCRWidget::initLangModel()
 {
-    QString val;
-    QFile file;
-    file.setFileName(":/lang.json");
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    val = file.readAll();
-    file.close();
-
-    QJsonDocument document = QJsonDocument::fromJson(val.toUtf8());
-    QJsonObject object = document.object();
-
-    QJsonObject::iterator i;
-    for (i = object.end(); i != object.begin(); --i) {
-        for (auto finfo : fileList) {
-            if (finfo.fileName().remove(".traineddata") == i.key().trimmed()) {
-                m_mdllng->insertRow(0);
-                m_mdllng->setData(m_mdllng->index(0, 1), i.key().trimmed());
-                m_mdllng->setData(m_mdllng->index(0, 0), i.value().toString().trimmed());
+    try{
+        QString val;
+        QFile file;
+        file.setFileName(":/lang.json");
+        if(file.open(QIODevice::ReadOnly | QIODevice::Text)){
+            val = file.readAll();
+            file.close();
+        }
+        QJsonDocument document = QJsonDocument::fromJson(val.toUtf8());
+        if(!document.isNull() || !document.isEmpty()){
+            QJsonObject object = document.object();
+            for (auto const &finfo : fileList) {
+                for (auto const &i : object.keys()) {
+                    if (finfo.fileName().remove(".traineddata") == i.trimmed()) {
+                        m_mdllng->insertRow(0);
+                        m_mdllng->setData(m_mdllng->index(0, 1), i.trimmed());
+                        m_mdllng->setData(m_mdllng->index(0, 0),
+                                          object.value(i.trimmed()).toString());
+                    }
+                }
             }
+            m_mdllng->sort(0);
+            selLang = m_settings.readSettings("Lang", "Selected").toString().split('+');
         }
     }
-    selLang = m_settings->readSettings("Lang", "Selected").toString().split('+');
+    catch (std::exception e) {
+        qWarning(e.what());
+    }
 }
 
 void OCRWidget::clearResult()
